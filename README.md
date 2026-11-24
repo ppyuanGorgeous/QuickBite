@@ -9,10 +9,11 @@ A food-ordering web application built with **React, TypeScript, Spring Boot, and
 - **Frontend engineering:** React Router, TanStack Query, loading skeletons, empty states, and API error handling.
 - **Backend engineering:** controller/service/repository layers, Spring Data JDBC, and Caffeine caching for restaurant and menu data.
 - **Cart APIs:** retrieve a customer's cart, add menu items, update quantities and totals, and clear the cart.
+- **Live cart and checkout:** display server-provided cart contents and totals, submit checkout once, and show a session-bound summary only after the server confirms success.
 
 ## Current scope
 
-Restaurant browsing and authentication use the backend API. The current React cart, checkout, and confirmation pages demonstrate the UI with sample cart data; connecting those pages to the existing cart APIs is a next step. The backend checkout endpoint clears the cart. Payment processing and persistent order history are not implemented.
+Restaurant browsing, authentication, shopping carts, and checkout use the backend API. Cart and checkout routes require sign-in and include loading, empty, and recoverable error states. Checkout waits for a successful server response before showing a summary, clears cached cart contents, and prevents duplicate submissions. The backend checkout endpoint clears the cart. Payment processing and persistent order history are not implemented.
 
 ## Technology stack
 
@@ -21,7 +22,7 @@ Restaurant browsing and authentication use the backend API. The current React ca
 | Frontend | React, TypeScript, Vite, React Router, Tailwind CSS, TanStack Query |
 | Backend | Java 21, Spring Boot, Spring Security, Spring Data JDBC, Caffeine |
 | Database | PostgreSQL 18 |
-| Development & testing | Docker Compose, Gradle Wrapper, JUnit 5, Mockito, Oxlint |
+| Development & testing | Docker Compose, Gradle Wrapper, JUnit 5, Mockito, Vitest, React Testing Library, Oxlint |
 
 ## Architecture
 
@@ -140,12 +141,14 @@ The full backend test suite also includes a Spring context test and requires a c
 INIT_DB=always bash ./gradlew test
 
 # From frontend/quickbite/
+npm test
 npm run lint
 npm run build
 ```
 
+Frontend regression tests cover cart loading/retry, quantities and line totals, empty carts, successful and failed checkout, duplicate clicks, expired sessions, account changes, and late session checks after checkout. A local integration check also verified registration, login, repeated menu-item additions, server totals, successful checkout, and a subsequently empty cart against Spring Boot and PostgreSQL.
+
 ## Next steps
 
-- Connect the cart and checkout UI to the cart query and mutation hooks.
 - Add persistent order records and an order history view.
 - Add end-to-end workflow tests and a hosted demonstration.

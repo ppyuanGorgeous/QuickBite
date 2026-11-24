@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
  import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
  import { api, ApiError } from './api'
+ import type { Cart } from './types'
 
  export const queryKeys = {
    restaurants: ['restaurants'] as const,
@@ -105,11 +106,18 @@ import { useEffect } from 'react'
  	},
  	retry: false,
  	onMutate: () => ({ sessionId: sessionGeneration(client) }),
- 	onSuccess: (_data, _variables, context) => {
-   	if (!sessionTransitions.has(client) && context?.sessionId === sessionGeneration(client)) {
-     	return client.invalidateQueries({ queryKey: queryKeys.cart })
-   	}
- 	},
+  onSuccess: async (_data, _variables, context) => {
+      if (sessionTransitions.has(client) || context?.sessionId !== sessionGeneration(client)) return
+      // The session probe also reads the cart; neither old response may restore it after checkout.
+      await Promise.all([
+        client.cancelQueries({ queryKey: queryKeys.session }),
+        client.cancelQueries({ queryKey: queryKeys.cart }),
+      ])
+    if (!sessionTransitions.has(client) && context?.sessionId === sessionGeneration(client)) {
+        client.setQueryData<Cart>(queryKeys.cart, { total_price: 0, order_items: [] })
+      void client.invalidateQueries({ queryKey: queryKeys.cart })
+    }
+  },
  	onError: (error, _variables, context) => {
    	if (context?.sessionId === sessionGeneration(client)) expireSession(client, error)
  	},

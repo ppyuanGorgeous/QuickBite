@@ -17,6 +17,8 @@ export interface MenuItem {
  }
 
  export interface CartItem {
+   order_item_id?: number
+   menu_item_id?: number
    id?: number
    menu_id?: number
    menu_item_name: string
