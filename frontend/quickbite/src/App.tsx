@@ -2,6 +2,7 @@ import { Link, Route, Routes } from 'react-router-dom'
  import { Layout } from '@/components/layout'
  import { EmptyState } from '@/components/feedback'
  import { Button } from '@/components/ui/button'
+ import { ProtectedRoute } from '@/components/protected-route'
  import { DiscoverPage } from '@/pages/discover'
  import { RestaurantPage } from '@/pages/restaurant'
  import { AuthPage } from '@/pages/auth'
@@ -16,9 +17,9 @@ import { Link, Route, Routes } from 'react-router-dom'
      	<Route path="restaurants/:id" element={<RestaurantPage />} />
      	<Route path="login" element={<AuthPage key="login" />} />
      	<Route path="signup" element={<AuthPage signup key="signup" />} />
-     	<Route path="cart" element={<CartPage key="cart" />} />
-     	<Route path="checkout" element={<CartPage checkout key="checkout" />} />
-     	<Route path="order-confirmation" element={<ConfirmationPage />} />
+      <Route path="cart" element={<ProtectedRoute><CartPage key="cart" /></ProtectedRoute>} />
+      <Route path="checkout" element={<ProtectedRoute><CartPage checkout key="checkout" /></ProtectedRoute>} />
+      <Route path="order-confirmation" element={<ProtectedRoute><ConfirmationPage /></ProtectedRoute>} />
      	<Route
        	path="*"
        	element={
